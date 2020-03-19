@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -49,13 +49,20 @@ namespace Apache.NMS.ActiveMQ.Test
         protected const int MSG_COUNT = 5;
         protected string nonExistantPath;
         protected NetTxConnectionFactory dtcFactory;
-        
+
         private ITrace oldTracer;
 
-        protected const string sqlConnectionString =
-            // "Data Source=localhost;Initial Catalog=TestDB;User ID=user;Password=password";
-            "Data Source=.\\SQLEXPRESS;Initial Catalog=TestDB;Integrated Security = true";
+        // Add these variables to the environment variable in your windows.        
+        protected static string sqlConnectionString;
+        protected const string sqlConnectionStringTemplate =
+            "Server=${sqlserverhost};Initial Catalog=${testdbname};User=${sqluser};Password=${sqlpassword}";
+
+        // This is needed to create the database if it is not created.
+        protected const string sqlConnectionStringForDBCreatingTemplate =
+            "server=${sqlserverhost};User=${sqluser};Password=${sqlpassword}";
+
         protected const string testTable = "TestTable";
+        protected const string testDB = "${testdbname}";
         protected const string testColumn = "TestID";
         protected const string testQueueName = "TestQueue";
         protected const string connectionURI = "tcpfaulty://${activemqhost}:61616";
@@ -66,6 +73,10 @@ namespace Apache.NMS.ActiveMQ.Test
             this.oldTracer = Tracer.Trace;
             this.nonExistantPath = Path.Combine(Directory.GetCurrentDirectory(), Guid.NewGuid().ToString());
 
+            sqlConnectionString = ReplaceEnvVar(sqlConnectionStringTemplate);
+
+            EnuserDatabaseCreated();
+
             base.SetUp();
 
             PurgeDestination();
@@ -75,7 +86,7 @@ namespace Apache.NMS.ActiveMQ.Test
         public override void TearDown()
         {
             DeleteDestination();
-            
+
             base.TearDown();
 
             Tracer.Trace = this.oldTracer;
@@ -115,6 +126,35 @@ namespace Apache.NMS.ActiveMQ.Test
                 }
 
                 sqlConnection.Close();
+            }
+        }
+
+        protected static void EnuserDatabaseCreated()
+        {
+            try
+            {
+                SqlConnection tmpConn = new SqlConnection(ReplaceEnvVar(sqlConnectionStringForDBCreatingTemplate));
+
+                string sqlCheckDBExistingQuery = string.Format("IF NOT EXISTS (SELECT name FROM master.dbo.sysdatabases WHERE name = N'{0}') CREATE DATABASE {0}", ReplaceEnvVar(testDB));
+                string sqlCreateTableIfNotExistQuery = string.Format("USE {0}; IF OBJECT_ID(N'dbo.{1}', N'U') IS NULL BEGIN CREATE TABLE {1} ({2} INT); END;", ReplaceEnvVar(testDB), testTable, testColumn);
+
+                using (tmpConn)
+                {
+                    tmpConn.Open();
+
+                    using (SqlCommand sqlCmd = new SqlCommand(sqlCheckDBExistingQuery, tmpConn))
+                    {
+                        sqlCmd.ExecuteNonQuery();
+                    }
+                    using (SqlCommand sqlCmd = new SqlCommand(sqlCreateTableIfNotExistQuery, tmpConn))
+                    {
+                        sqlCmd.ExecuteNonQuery();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Tracer.DebugFormat("Test Driver received Error Notification: {0}", ex.Message);
             }
         }
 
@@ -296,7 +336,7 @@ namespace Apache.NMS.ActiveMQ.Test
                         int count = 0;
                         IEnumerator enumerator = browser.GetEnumerator();
 
-                        while(enumerator.MoveNext())
+                        while (enumerator.MoveNext())
                         {
                             IMessage msg = enumerator.Current as IMessage;
                             Assert.IsNotNull(msg, "message is not in the queue !");
@@ -326,7 +366,7 @@ namespace Apache.NMS.ActiveMQ.Test
         }
 
         protected void VerifyBrokerQueueCount(int expectedCount, string connectionUri)
-        {           
+        {
             using (INetTxConnection connection = dtcFactory.CreateNetTxConnection())
             {
                 // check messages are present in the queue
