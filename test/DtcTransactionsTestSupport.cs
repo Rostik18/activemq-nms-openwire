@@ -52,20 +52,14 @@ namespace Apache.NMS.ActiveMQ.Test
 
         private ITrace oldTracer;
 
-        // Add these variables to the environment variable in your windows.        
-        protected static string sqlConnectionString;
-        protected const string sqlConnectionStringTemplate =
-            "Server=${sqlserverhost};Initial Catalog=${testdbname};User=${sqluser};Password=${sqlpassword}";
-
         // This is needed to create the database if it is not created.
-        protected const string sqlConnectionStringForDBCreatingTemplate =
-            "server=${sqlserverhost};User=${sqluser};Password=${sqlpassword}";
-
+        protected static string sqlConnectionStringForDBCreating;
+        protected static string sqlConnectionString;
         protected const string testTable = "TestTable";
-        protected const string testDB = "${testdbname}";
+        protected static string testDB;
         protected const string testColumn = "TestID";
         protected const string testQueueName = "TestQueue";
-        protected const string connectionURI = "tcpfaulty://${activemqhost}:61616";
+        protected static string connectionURI;
 
         [SetUp]
         public override void SetUp()
@@ -73,7 +67,10 @@ namespace Apache.NMS.ActiveMQ.Test
             this.oldTracer = Tracer.Trace;
             this.nonExistantPath = Path.Combine(Directory.GetCurrentDirectory(), Guid.NewGuid().ToString());
 
-            sqlConnectionString = ReplaceEnvVar(sqlConnectionStringTemplate);
+            sqlConnectionString = TestContext.Parameters["sqlConnectionString"];
+            connectionURI = TestContext.Parameters["activeMQConnectionURI"];
+            sqlConnectionStringForDBCreating = TestContext.Parameters["sqlConnectionStringForDBCreating"];
+            testDB= TestContext.Parameters["testDBName"];
 
             EnuserDatabaseCreated();
 
@@ -133,10 +130,10 @@ namespace Apache.NMS.ActiveMQ.Test
         {
             try
             {
-                SqlConnection tmpConn = new SqlConnection(ReplaceEnvVar(sqlConnectionStringForDBCreatingTemplate));
+                SqlConnection tmpConn = new SqlConnection(sqlConnectionStringForDBCreating);
 
-                string sqlCheckDBExistingQuery = string.Format("IF NOT EXISTS (SELECT name FROM master.dbo.sysdatabases WHERE name = N'{0}') CREATE DATABASE {0}", ReplaceEnvVar(testDB));
-                string sqlCreateTableIfNotExistQuery = string.Format("USE {0}; IF OBJECT_ID(N'dbo.{1}', N'U') IS NULL BEGIN CREATE TABLE {1} ({2} INT); END;", ReplaceEnvVar(testDB), testTable, testColumn);
+                string sqlCheckDBExistingQuery = string.Format("IF NOT EXISTS (SELECT name FROM master.dbo.sysdatabases WHERE name = N'{0}') CREATE DATABASE {0}", testDB);
+                string sqlCreateTableIfNotExistQuery = string.Format("USE {0}; IF OBJECT_ID(N'dbo.{1}', N'U') IS NULL BEGIN CREATE TABLE {1} ({2} INT); END;", testDB, testTable, testColumn);
 
                 using (tmpConn)
                 {
