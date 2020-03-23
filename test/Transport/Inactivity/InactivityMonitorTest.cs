@@ -71,7 +71,7 @@ namespace Apache.NMS.ActiveMQ.Test
         }
 
         [Test]
-        public void TestCreate()
+        public void ATestCreate()
         {
             InactivityMonitor monitor = new InactivityMonitor( this.transport );
 
@@ -83,7 +83,7 @@ namespace Apache.NMS.ActiveMQ.Test
         }
 
         [Test]
-        public void TestReadTimeout()
+        public void BTestReadTimeout()
         {
             InactivityMonitor monitor = new InactivityMonitor( this.transport );
 
@@ -103,7 +103,7 @@ namespace Apache.NMS.ActiveMQ.Test
         }
 
         [Test]
-        public void TestWriteMessageFail()
+        public void CTestWriteMessageFail()
         {
             this.transport.FailOnKeepAliveInfoSends = true ;
             this.transport.NumSentKeepAliveInfosBeforeFail = 4;
@@ -133,7 +133,7 @@ namespace Apache.NMS.ActiveMQ.Test
         }
 
         [Test]
-        public void TestNonFailureSendCase()
+        public void DTestNonFailureSendCase()
         {
             InactivityMonitor monitor = new InactivityMonitor( this.transport );
 
