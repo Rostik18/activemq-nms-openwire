@@ -70,7 +70,7 @@ namespace Apache.NMS.ActiveMQ.Test
             sqlConnectionString = TestContext.Parameters["sqlConnectionString"];
             connectionURI = TestContext.Parameters["activeMQConnectionURI"];
             sqlConnectionStringForDBCreating = TestContext.Parameters["sqlConnectionStringForDBCreating"];
-            testDB= TestContext.Parameters["testDBName"];
+            testDB = TestContext.Parameters["testDBName"];
 
             EnuserDatabaseCreated();
 
@@ -132,14 +132,14 @@ namespace Apache.NMS.ActiveMQ.Test
             {
                 SqlConnection tmpConn = new SqlConnection(sqlConnectionStringForDBCreating);
 
-                string sqlCheckDBExistingQuery = string.Format("IF NOT EXISTS (SELECT name FROM master.dbo.sysdatabases WHERE name = N'{0}') CREATE DATABASE {0}", testDB);
+                string sqlCreateDBIfNotExistQuery = string.Format("IF NOT EXISTS (SELECT name FROM master.dbo.sysdatabases WHERE name = N'{0}') CREATE DATABASE {0}", testDB);
                 string sqlCreateTableIfNotExistQuery = string.Format("USE {0}; IF OBJECT_ID(N'dbo.{1}', N'U') IS NULL BEGIN CREATE TABLE {1} ({2} INT); END;", testDB, testTable, testColumn);
 
                 using (tmpConn)
                 {
                     tmpConn.Open();
 
-                    using (SqlCommand sqlCmd = new SqlCommand(sqlCheckDBExistingQuery, tmpConn))
+                    using (SqlCommand sqlCmd = new SqlCommand(sqlCreateDBIfNotExistQuery, tmpConn))
                     {
                         sqlCmd.ExecuteNonQuery();
                     }
