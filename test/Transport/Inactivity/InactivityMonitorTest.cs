@@ -71,7 +71,7 @@ namespace Apache.NMS.ActiveMQ.Test
         }
 
         [Test]
-        public void ATestCreate()
+        public void TestCreate()
         {
             InactivityMonitor monitor = new InactivityMonitor( this.transport );
 
@@ -83,7 +83,7 @@ namespace Apache.NMS.ActiveMQ.Test
         }
 
         [Test]
-        public void BTestReadTimeout()
+        public void TestReadTimeout()
         {
             InactivityMonitor monitor = new InactivityMonitor( this.transport );
 
@@ -103,7 +103,7 @@ namespace Apache.NMS.ActiveMQ.Test
         }
 
         [Test]
-        public void CTestWriteMessageFail()
+        public void TestWriteMessageFail()
         {
             this.transport.FailOnKeepAliveInfoSends = true ;
             this.transport.NumSentKeepAliveInfosBeforeFail = 4;
@@ -121,8 +121,9 @@ namespace Apache.NMS.ActiveMQ.Test
 			
             // Channel should have been inactive for to long.
             Assert.IsTrue( this.exceptions.Count > 0 );
-			
-			try
+
+            Thread.Sleep(10000);
+            try
 			{
             	monitor.Oneway(new ActiveMQMessage());
 				Assert.Fail("Should have thrown an exception");
@@ -133,7 +134,7 @@ namespace Apache.NMS.ActiveMQ.Test
         }
 
         [Test]
-        public void DTestNonFailureSendCase()
+        public void TestNonFailureSendCase()
         {
             InactivityMonitor monitor = new InactivityMonitor( this.transport );
 
