@@ -59,7 +59,7 @@ namespace Apache.NMS.ActiveMQ.Test
         protected static string testDB;
         protected const string testColumn = "TestID";
         protected const string testQueueName = "TestQueue";
-        protected static string connectionURI;
+        protected const string connectionURI = "tcpfaulty://${activemqhost}:61616";
 
         [SetUp]
         public override void SetUp()
@@ -68,11 +68,10 @@ namespace Apache.NMS.ActiveMQ.Test
             this.nonExistantPath = Path.Combine(Directory.GetCurrentDirectory(), Guid.NewGuid().ToString());
 
             sqlConnectionString = TestContext.Parameters["sqlConnectionString"];
-            connectionURI = TestContext.Parameters["activeMQConnectionURI"];
             sqlConnectionStringForDBCreating = TestContext.Parameters["sqlConnectionStringForDBCreating"];
             testDB = TestContext.Parameters["testDBName"];
 
-            EnuserDatabaseCreated();
+            EnsureDatabaseCreated();
 
             base.SetUp();
 
@@ -126,7 +125,7 @@ namespace Apache.NMS.ActiveMQ.Test
             }
         }
 
-        protected static void EnuserDatabaseCreated()
+        protected static void EnsureDatabaseCreated()
         {
             try
             {
