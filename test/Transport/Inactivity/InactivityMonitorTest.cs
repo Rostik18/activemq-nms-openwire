@@ -122,7 +122,6 @@ namespace Apache.NMS.ActiveMQ.Test
             // Channel should have been inactive for to long.
             Assert.IsTrue( this.exceptions.Count > 0 );
 
-            Thread.Sleep(10000);
             try
 			{
             	monitor.Oneway(new ActiveMQMessage());
@@ -156,6 +155,9 @@ namespace Apache.NMS.ActiveMQ.Test
 
             // Channel should have been inactive for to long.
             Assert.IsTrue( this.exceptions.Count == 0 );
+
+            //Stop monitor to release it for other tests.
+            monitor.Stop();
         }
 
     }
