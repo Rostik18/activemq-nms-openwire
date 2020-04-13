@@ -425,20 +425,20 @@ namespace Apache.NMS.ActiveMQ.Test.Commands
             }
         }
 
-        // This test is unnecessary because the Properties.SetString method does not check empty string.
-        //[Test]
-        //public void TestSetEmptyPropertyName() 
-        //{
-        //    ActiveMQMessage msg = new ActiveMQMessage();
-        //    try 
-        //    {
-        //        msg.Properties.SetString("", "Cheese");
-        //        Assert.Fail("Should have thrown exception");
-        //    }
-        //    catch(Exception)
-        //    {
-        //    }
-        //}
+       [Test]
+       [Ignore("Looks like this test was never passing.")]
+        public void TestSetEmptyPropertyName()
+        {
+            ActiveMQMessage msg = new ActiveMQMessage();
+            try
+            {
+                msg.Properties.SetString("", "Cheese");
+                Assert.Fail("Should have thrown exception");
+            }
+            catch (Exception)
+            {
+            }
+        }
 
         [Test]
         public void TestGetAndSetNMSXDeliveryCount() 
