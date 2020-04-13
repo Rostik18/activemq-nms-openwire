@@ -56,15 +56,14 @@ namespace Apache.NMS.ActiveMQ.Test
             Assert.AreEqual(20, transport.NumSentMessagesBeforeFail);
         }
 
-        [Test]
-        [ExpectedException( typeof(IOException))]        
+        [Test]     
         public void CreationFailMockTransportTest()
         {
             MockTransportFactory factory = new MockTransportFactory();
             
             Uri location = new Uri("mock://0.0.0.0:61616?transport.failOnCreate=true");
-            
-            factory.CreateTransport(location);
+
+            Assert.Catch<NMSException>(() => factory.CreateTransport(location));
         }
         
     }

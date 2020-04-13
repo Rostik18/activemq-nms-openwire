@@ -36,7 +36,6 @@ namespace Apache.NMS.ActiveMQ.Test
         }
 
         [Test]
-        [ExpectedException(typeof(NMSException))]
         public void TestSessionCreateFailsWithInvalidLogLocation()
         {
             using (INetTxConnection connection = dtcFactory.CreateNetTxConnection())
@@ -47,7 +46,8 @@ namespace Apache.NMS.ActiveMQ.Test
                 NetTxConnection con = connection as NetTxConnection;
                 NetTxRecoveryPolicy policy = con.RecoveryPolicy;
                 (policy.RecoveryLogger as RecoveryFileLogger).Location = nonExistantPath;
-                connection.CreateNetTxSession();
+
+                Assert.Catch<NMSException>(()=> connection.CreateNetTxSession() );
             }
         }
 

@@ -281,14 +281,17 @@ namespace Apache.NMS.ActiveMQ.Test
         }
 		
         [Test]
-        [ExpectedException( typeof(Apache.NMS.NMSException))]
         public void TestConfigureRecoveryPolicyLoggerTypeWithInvalidType(
             [Values("tcp://${activemqhost}:61616?nms.RecoveryPolicy.RecoveryLoggerType=invalid")]
             string baseConnectionURI)
         {
-            INetTxConnectionFactory factory = new NetTxConnectionFactory(NMSTestSupport.ReplaceEnvVar(baseConnectionURI));
+            Assert.Catch<NMSException>(() =>
+                {
+                    INetTxConnectionFactory factory = new NetTxConnectionFactory(NMSTestSupport.ReplaceEnvVar(baseConnectionURI));
 
-            using(IConnection connection = factory.CreateConnection()){}
+                    using (IConnection connection = factory.CreateConnection()) { }
+                }
+            );
         }
     }
 }

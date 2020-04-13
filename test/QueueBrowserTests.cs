@@ -194,17 +194,19 @@ namespace Apache.NMS.ActiveMQ.Test
 		}
 		
         [Test]
-        [ExpectedException(typeof(NMSException))]
         public void TestCreateBrowserFailsWithZeroPrefetch()
         {
-            using (Connection connection = CreateConnection() as Connection)
-            using (ISession session = connection.CreateSession(AcknowledgementMode.AutoAcknowledge))
+            Assert.Catch<NMSException>(() =>
             {
-                connection.PrefetchPolicy.QueueBrowserPrefetch = 0;
-                IQueue queue = session.CreateTemporaryQueue();
-                IQueueBrowser browser = session.CreateBrowser(queue);
-				browser.Close();
-            }
+                using (Connection connection = CreateConnection() as Connection)
+                using (ISession session = connection.CreateSession(AcknowledgementMode.AutoAcknowledge))
+                {
+                    connection.PrefetchPolicy.QueueBrowserPrefetch = 0;
+                    IQueue queue = session.CreateTemporaryQueue();
+                    IQueueBrowser browser = session.CreateBrowser(queue);
+                    browser.Close();
+                }
+            });
         }
 
         [Test]

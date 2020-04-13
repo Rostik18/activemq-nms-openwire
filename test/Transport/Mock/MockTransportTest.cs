@@ -52,12 +52,11 @@ namespace Apache.NMS.ActiveMQ.Test
 		}
 
 		[Test]
-		[ExpectedException(typeof(InvalidOperationException))]
 		public void StartUnitializedTransportTest()
 		{
-			MockTransport transport = new MockTransport(mockUri);
-			transport.Start();
-		}
+            MockTransport transport = new MockTransport(mockUri);
+			Assert.Catch<InvalidOperationException>(() => transport.Start());
+        }
 
 		public void OnException(ITransport transport, Exception exception)
 		{
@@ -135,68 +134,83 @@ namespace Apache.NMS.ActiveMQ.Test
 			Assert.AreEqual(message.Text, (sent[0] as ActiveMQTextMessage).Text);
 		}
 
-		[Test, ExpectedException(typeof(IOException))]
+		[Test]
 		public void OneWayFailOnSendMessageTest()
 		{
 			transport.FailOnSendMessage = true;
 			transport.Start();
 			ActiveMQTextMessage message = new ActiveMQTextMessage();
-			transport.Oneway(message);
+            Assert.Catch<IOException>(() => transport.Oneway(message));
 		}
 
-		[Test, ExpectedException(typeof(IOException))]
+		[Test]
 		public void RequestFailOnSendMessageTest()
-		{
-			transport.FailOnSendMessage = true;
-			transport.Start();
-			ActiveMQTextMessage message = new ActiveMQTextMessage();
-			Assert.IsNotNull(transport.Request(message));
-		}
+        {
+            Assert.Catch<IOException>(() =>
+            {
+                transport.FailOnSendMessage = true;
+                transport.Start();
+                ActiveMQTextMessage message = new ActiveMQTextMessage();
+                Assert.IsNotNull(transport.Request(message));
+            });
+        }
 
-		[Test, ExpectedException(typeof(IOException))]
+		[Test]
 		public void AsyncRequestFailOnSendMessageTest()
-		{
-			transport.FailOnSendMessage = true;
-			transport.Start();
-			ActiveMQTextMessage message = new ActiveMQTextMessage();
-			Assert.IsNotNull(transport.AsyncRequest(message));
-		}
+        {
+            Assert.Catch<IOException>(() =>
+            {
+                transport.FailOnSendMessage = true;
+                transport.Start();
+                ActiveMQTextMessage message = new ActiveMQTextMessage();
+                Assert.IsNotNull(transport.AsyncRequest(message));
+            });
+        }
 
-		[Test, ExpectedException(typeof(IOException))]
+		[Test]
 		public void OnewayFailOnSendTwoMessagesTest()
-		{
-			transport.FailOnSendMessage = true;
-			transport.NumSentMessagesBeforeFail = 2;
-			transport.Start();
-			ActiveMQTextMessage message = new ActiveMQTextMessage();
-			transport.Oneway(message);
-			transport.Oneway(message);
-			transport.Oneway(message);
-		}
+        {
+            Assert.Catch<IOException>(() =>
+            {
+                transport.FailOnSendMessage = true;
+                transport.NumSentMessagesBeforeFail = 2;
+                transport.Start();
+                ActiveMQTextMessage message = new ActiveMQTextMessage();
+                transport.Oneway(message);
+                transport.Oneway(message);
+                transport.Oneway(message);
+            });
+        }
 
-		[Test, ExpectedException(typeof(IOException))]
+		[Test]
 		public void RequestFailOnSendTwoMessagesTest()
-		{
-			transport.FailOnSendMessage = true;
-			transport.NumSentMessagesBeforeFail = 2;
-			transport.Start();
-			ActiveMQTextMessage message = new ActiveMQTextMessage();
-			transport.Request(message);
-			transport.Request(message);
-			transport.Request(message);
-		}
+        {
+            Assert.Catch<IOException>(() =>
+            {
+                transport.FailOnSendMessage = true;
+                transport.NumSentMessagesBeforeFail = 2;
+                transport.Start();
+                ActiveMQTextMessage message = new ActiveMQTextMessage();
+                transport.Request(message);
+                transport.Request(message);
+                transport.Request(message);
+            });
+        }
 
-		[Test, ExpectedException(typeof(IOException))]
+		[Test]
 		public void AsyncRequestFailOnSendTwoMessagesTest()
-		{
-			transport.FailOnSendMessage = true;
-			transport.NumSentMessagesBeforeFail = 2;
-			transport.Start();
-			ActiveMQTextMessage message = new ActiveMQTextMessage();
-			transport.AsyncRequest(message);
-			transport.AsyncRequest(message);
-			transport.AsyncRequest(message);
-		}
+        {
+            Assert.Catch<IOException>(() =>
+            {
+                transport.FailOnSendMessage = true;
+                transport.NumSentMessagesBeforeFail = 2;
+                transport.Start();
+                ActiveMQTextMessage message = new ActiveMQTextMessage();
+                transport.AsyncRequest(message);
+                transport.AsyncRequest(message);
+                transport.AsyncRequest(message);
+            });
+        }
 
 		[Test]
 		public void InjectCommandTest()
